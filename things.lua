@@ -1,18 +1,18 @@
 local lg = love.graphics
 
-local Sprite = {
+age.component("sprite", {
 	x = 160,
 	y = 120,
 	w = 16,
 	h = 16,
 	q = nil,
 	img = nil,
-}
+})
 
-function Sprite:draw()
-	local c = self.color
-	local img = self.img
-	local w, h = self.w, self.h
+age.system("sprite", function (e)
+	local c = e.color
+	local img = e.img
+	local w, h = e.w, e.h
 	local wo, ho = -w*0.5, -h*0.5
 
 	if not c then
@@ -23,10 +23,10 @@ function Sprite:draw()
 	end
 
 	lg.push()
-	lg.translate(self.x, self.y)
+	lg.translate(e.x, e.y)
 	lg.setColor(c)
 	if img then
-		local q = self.q
+		local q = e.q
 		if q then
 			lg.draw(img, q, wo, ho)
 		else
@@ -37,16 +37,17 @@ function Sprite:draw()
 	end
 	lg.setColor(1, 1, 1)
 	lg.pop()
-end
+end)
 
-local Hero = Age.clone(Sprite, {
-	x = 160,
-	y = 120,
+age.component("hero", {
+	parents = {"sprite"},
 	color = {1, 0.5, 0},
 })
 
-function Hero:update(dt)
-	self:draw()
-end
+age.receive("hero", "keypressed", function (e, key)
+	print("pressed " .. key)
+end)
 
-Age.template("hero", Hero)
+age.receive("hero", "keyreleased", function (e, key)
+	print("released " .. key)
+end)

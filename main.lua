@@ -1,31 +1,40 @@
 lg = love.graphics
 lg.setDefaultFilter("nearest", "nearest")
 
-Age = require("age")
-VP = require("viewport")
+age = require("age")
+local vp = require("viewport")
 
-VP.setup()
+vp.setup()
 
-clearColor = {0, 1/3, 2/3}
+clearColor = {0, 0.5, 1}
 
 function love.update(dt)
-	lg.setCanvas(VP.canvas)
+	lg.setCanvas(vp.canvas)
 	lg.clear(clearColor)
-	Age.update(dt)
+
+	age.update(dt)
+
 	lg.setCanvas()
 end
 
 function love.resize(w, h)
-	VP.resize(w, h)
+	vp.resize(w, h)
 end
 
-love.draw = VP.draw
+love.draw = vp.draw
+
+local worlds = require("worlds")
+local world = worlds.start()
+
+function love.keypressed(key)
+	world.keypressed(key)
+end
 
 function love.keyreleased(key)
 	if key == "f12" then
 		love.event.quit()
+		return
 	end
-end
 
-local worlds = require("worlds")
-worlds.start()
+	world.keyreleased(key)
+end
