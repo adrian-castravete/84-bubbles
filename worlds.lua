@@ -4,11 +4,11 @@ local function start()
 	age.entity("hero")
 
 	return {
-		keypressed = function (key)
-			age.send("hero", "keypressed", key)
+		pressed = function (b)
+			age.send("hero", "pressed", b)
 		end,
-		keyreleased = function (key)
-			age.send("hero", "keyreleased", key)
+		released = function (b)
+			age.send("hero", "released", b)
 		end,
 	}
 end

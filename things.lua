@@ -82,8 +82,8 @@ age.system("hero-bubble", function (e, dt)
 	end
 end)
 
-age.receive("hero", "keypressed", function (e, key)
-	if key == "space" then
+age.receive("hero", "pressed", function (e, b)
+	if b == "jump" then
 		age.entity("hero-bubble", {
 			x = e.x + 8,
 			y = e.y,
@@ -91,5 +91,5 @@ age.receive("hero", "keypressed", function (e, key)
 	end
 end)
 
-age.receive("hero", "keyreleased", function (e, key)
+age.receive("hero", "released", function (e, b)
 end)
