@@ -6,7 +6,11 @@ local vp = require("age.viewport")
 vp.setup()
 
 local input = require("age.input")
-input.setup()
+input.setup {
+	keyboard = {
+		space = "jump",
+	},
+}
 
 clearColor = {0, 0.5, 1}
 
@@ -45,3 +49,11 @@ love.touchmoved = input.touchmoved
 
 local worlds = require("worlds")
 local world = worlds.start()
+
+input.onpressed(function(btn)
+	world.pressed(btn)
+end)
+
+input.onreleased(function(btn)
+	world.released(btn)
+end)
