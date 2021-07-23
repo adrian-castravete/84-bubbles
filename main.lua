@@ -12,10 +12,26 @@ input.setup {
 	},
 	touch = {
 		controls = {
-			jump = {
-				anchor = "rd",
-				size = 25,
+			{
+				kind = "dpad",
+				names = {"left", "up", "right", "down"},
+				anchor = "ld",
+				size = 40,
 				gap = 5,
+			},
+			{
+				name = "jump",
+				anchor = "rd",
+				size = 20,
+				gapX = 30,
+				gapY = 5,
+			},
+			{
+				name = "fire",
+				anchor = "rd",
+				size = 20,
+				gapX = 5,
+				gapY = 10,
 			}
 		}
 	},
