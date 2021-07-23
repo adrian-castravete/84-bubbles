@@ -8,7 +8,16 @@ vp.setup()
 local input = require("age.input")
 input.setup {
 	keyboard = {
-		space = "jump",
+		jump = {"space"},
+	},
+	touch = {
+		controls = {
+			jump = {
+				anchor = "rd",
+				size = 25,
+				gap = 5,
+			}
+		}
 	},
 }
 
@@ -47,13 +56,32 @@ love.touchpressed = input.touchpressed
 love.touchreleased = input.touchreleased
 love.touchmoved = input.touchmoved
 
+local bs = {}
+function love.mousepressed(x, y, b)
+	bs[b] = true
+	input.touchpressed(b, x, y)
+end
+
+function love.mousereleased(x, y, b)
+	bs[b] = false
+	input.touchreleased(b, x, y)
+end
+
+function love.mousemoved(x, y, dx, dy)
+	for i=1, 3 do
+		if bs[i] then
+			input.touchmoved(i, x, y, dx, dy)
+		end
+	end
+end
+
 local worlds = require("worlds")
 local world = worlds.start()
 
-input.onpressed(function(btn)
+input.onButtonPressed(function(btn)
 	world.pressed(btn)
 end)
 
-input.onreleased(function(btn)
+input.onButtonReleased(function(btn)
 	world.released(btn)
 end)
