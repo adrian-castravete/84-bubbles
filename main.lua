@@ -9,6 +9,10 @@ local input = require("age.input")
 input.setup {
 	keyboard = {
 		jump = {"space"},
+		left = {"left", "a"},
+		up = {"up", "w"},
+		right = {"right", "d"},
+		down = {"down", "s"},
 	},
 	touch = {
 		controls = {

@@ -88,6 +88,14 @@ age.receive("hero", "pressed", function (e, b)
 			x = e.x + 8,
 			y = e.y,
 		})
+	elseif b == "left" then
+		e.x = e.x - 1
+	elseif b == "up" then
+		e.y = e.y - 1
+	elseif b == "right" then
+		e.x = e.x + 1
+	elseif b == "down" then
+		e.y = e.y + 1
 	end
 end)
 
