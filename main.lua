@@ -18,7 +18,6 @@ input.setup {
 		controls = {
 			{
 				kind = "dpad",
-				names = {"left", "up", "right", "down"},
 				anchor = "ld",
 				size = 40,
 				gap = 5,

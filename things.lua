@@ -14,6 +14,7 @@ age.component("hero", {
 	parents = {"sprite"},
 	color = {1, 0.5, 0},
 	state = "idle",
+	buttons = {},
 })
 
 local bubbleQuads = {
@@ -82,22 +83,31 @@ age.system("hero-bubble", function (e, dt)
 	end
 end)
 
+age.system("hero", function(e, dt)
+	local bs = e.buttons
+	local v, c = 16 * dt, 0
+	local dx, dy = 0, 0
+	if bs.left then dx = -1 c = c + 1 end
+	if bs.up then dy = -1 c = c + 1 end
+	if bs.right then dx = 1 c = c + 1 end
+	if bs.down then dy = 1 c = c + 1 end
+	if c > 1 then
+		v = v * 0.707
+	end
+	e.x = e.x + dx * v
+	e.y = e.y + dy * v
+end)
+
 age.receive("hero", "pressed", function (e, b)
+	e.buttons[b] = true
 	if b == "jump" then
 		age.entity("hero-bubble", {
 			x = e.x + 8,
 			y = e.y,
 		})
-	elseif b == "left" then
-		e.x = e.x - 1
-	elseif b == "up" then
-		e.y = e.y - 1
-	elseif b == "right" then
-		e.x = e.x + 1
-	elseif b == "down" then
-		e.y = e.y + 1
 	end
 end)
 
 age.receive("hero", "released", function (e, b)
+	e.buttons[b] = false
 end)
