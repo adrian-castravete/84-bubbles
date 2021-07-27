@@ -1,5 +1,22 @@
 local lg = love.graphics
-local img = lg.newImage("slimo.png")
+local spritesheet = require("age.spritesheet")
+local sprites = spritesheet.build {
+	fileName = "slimo.png",
+	quadGen = {
+		bubble = {
+			w = 8,
+			h = 8,
+			y = 48,
+			n = 3,
+		}
+	}
+}
+sprites.bubbleReel = {
+	1, 1, 1, 1,
+	1, 2, 2, 3,
+	3, 3, 2, 2,
+	3, 2, 2, 2,
+}
 
 age.component("sprite", {
 	x = 160,
@@ -15,28 +32,19 @@ age.component("hero", {
 	color = {1, 0.5, 0},
 	state = "idle",
 	buttons = {},
+	hf = false,
 })
 
-local bubbleQuads = {
-	0, 0, 0, 0,
-	0, 1, 1, 2,
-	2, 2, 1, 1,
-	2, 1, 1, 1,
-}
-for i=1, #bubbleQuads do
-	bubbleQuads[i] = lg.newQuad(bubbleQuads[i] * 8, 48, 8, 8, 128, 128)
-end
 age.component("hero-bubble", {
 	parents = {"sprite"},
-	img = img,
-	q = bubbleQuads[1],
+	img = sprites.image,
+	reel = sprites.quads.bubble,
+	q = 1,
 	w = 8,
 	h = 8,
-	headingLeft = false,
-	speed = 2,
-	animSpeed = 0.0625,
-	step = 1,
-	accumStep = 0,
+	hf = false,
+	speed = 32,
+	animSpeed = 0.625,
 })
 
 age.system("sprite", function (e)
@@ -44,6 +52,8 @@ age.system("sprite", function (e)
 	local img = e.img
 	local w, h = e.w, e.h
 	local wo, ho = -w*0.5, -h*0.5
+	local hf = e.hf and -1 or 1
+	local vf = e.vf and -1 or 1
 
 	if not c then
 		c = {1, 1, 1}
@@ -56,11 +66,10 @@ age.system("sprite", function (e)
 	lg.translate(e.x, e.y)
 	lg.setColor(c)
 	if img then
-		local q = e.q
-		if q then
-			lg.draw(img, q, wo, ho, 0)
+		if e.reel then
+			lg.draw(img, e.reel[e.q or 1], wo * hf, ho * vf, 0, hf, vf)
 		else
-			lg.draw(img, wo, ho, 0)
+			lg.draw(img, wo * hf, ho * vf, 0, hf, vf)
 		end
 	else
 		lg.rectangle("fill", wo, ho, w, h)
@@ -69,18 +78,25 @@ age.system("sprite", function (e)
 	lg.pop()
 end)
 
+local function spawnHeroBubble(h)
+	local dir = h.hf and -1 or 1
+	local e = age.entity("hero-bubble", {
+		x = h.x + dir * 8,
+		y = h.y,
+		hf = h.hf,
+	})
+	age.tween(e.animSpeed, function (p, dt)
+		local v = math.floor(p / e.animSpeed * #sprites.bubbleReel)
+		e.q = sprites.bubbleReel[v + 1]
+		return dt
+	end, function ()
+		e.destroy = true
+	end)
+end
+
 age.system("hero-bubble", function (e, dt)
-	e.accumStep = e.accumStep + dt
-	if e.accumStep > e.animSpeed then
-		e.accumStep = e.accumStep - e.animSpeed
-		e.step = e.step + 1
-		e.x = e.x + e.speed
-		if e.step > #bubbleQuads then
-			e.destroy = true
-			return
-		end
-		e.q = bubbleQuads[e.step]
-	end
+	local dir = e.hf and -1 or 1
+	e.x = e.x + e.speed * dt * dir
 end)
 
 age.system("hero", function(e, dt)
@@ -101,10 +117,13 @@ end)
 age.receive("hero", "pressed", function (e, b)
 	e.buttons[b] = true
 	if b == "jump" then
-		age.entity("hero-bubble", {
-			x = e.x + 8,
-			y = e.y,
-		})
+		spawnHeroBubble(e)
+	end
+	if b == "left" then
+		e.hf = true
+	end
+	if b == "right" then
+		e.hf = false
 	end
 end)
 
